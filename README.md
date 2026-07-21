@@ -5,8 +5,6 @@
   </picture>
 </p>
 
-<h1 align="center">Roots</h1>
-
 <p align="center">
   <strong>Self-attaching agent orchestration.</strong><br>
   Drop it into any project. It grills you on the goal, decomposes it into
