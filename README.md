@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="assets/Asset%201.svg" alt="Roots" width="140">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/Asset%201.svg">
+    <img src="assets/roots-logo-light.svg" alt="Roots" width="360">
+  </picture>
 </p>
 
 <h1 align="center">Roots</h1>
