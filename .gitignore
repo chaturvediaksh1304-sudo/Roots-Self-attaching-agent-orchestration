@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Test / cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Roots runtime output
+.roots/
+
+# OS / editor
+.DS_Store
+*.swp
+
+# Stray archive
+md files.zip
