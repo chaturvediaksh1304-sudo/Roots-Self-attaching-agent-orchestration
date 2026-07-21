@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/Asset%201.svg">
-    <img src="assets/roots-logo-light.svg" alt="Roots" width="360">
+    <source media="(prefers-color-scheme: dark)" srcset="assets/White-logo.png">
+    <img src="assets/Blac-logo.png" alt="Roots" width="420">
   </picture>
 </p>
 
