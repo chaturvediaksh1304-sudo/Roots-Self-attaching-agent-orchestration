@@ -69,6 +69,12 @@ Begin your reply with a single line `SUMMARY: <one sentence>`, then a blank line
   (one `Task`/Agent call each, in a single message). Give each subagent: its
   boundary as the task, its tool allowlist, the results of its dependencies, and
   the output contract (reply must start with `SUMMARY: <one sentence>`).
+- **Subagents must not write files.** Instruct every subagent to *return*
+  deliverable contents in its reply (code in fenced blocks), not write them to
+  disk — a subagent that writes can leak files outside the project. **You** (the
+  runtime) are the only writer: after a subagent returns, write any deliverable
+  files it produced into the current project root (never outside it), then write
+  its `./.roots/agents/<name>.result.md`.
 - For each subagent, write `./.roots/agents/<name>.result.md`:
 ```
 ## Summary
