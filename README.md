@@ -57,26 +57,26 @@ Pick whichever tool you already use — all install the `roots` CLI onto your PA
 ### pipx (recommended — isolated global CLI)
 
 ```bash
-pipx install git+https://github.com/chaturvediaksh1304-sudo/Roots.git
+pipx install git+https://github.com/chaturvediaksh1304-sudo/Roots-Self-attaching-agent-orchestration.git
 ```
 
 ### pip
 
 ```bash
-pip install git+https://github.com/chaturvediaksh1304-sudo/Roots.git
+pip install git+https://github.com/chaturvediaksh1304-sudo/Roots-Self-attaching-agent-orchestration.git
 ```
 
 ### uv
 
 ```bash
-uv tool install git+https://github.com/chaturvediaksh1304-sudo/Roots.git
+uv tool install git+https://github.com/chaturvediaksh1304-sudo/Roots-Self-attaching-agent-orchestration.git
 ```
 
 ### From source (for development)
 
 ```bash
-git clone https://github.com/chaturvediaksh1304-sudo/Roots.git
-cd Roots
+git clone https://github.com/chaturvediaksh1304-sudo/Roots-Self-attaching-agent-orchestration.git
+cd Roots-Self-attaching-agent-orchestration
 python3.11 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 ```
