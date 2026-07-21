@@ -1,0 +1,10 @@
+{
+  "name": "roots",
+  "description": "Self-attaching agent orchestration — grills you on the goal, decomposes it into non-overlapping subtasks, generates specialized subagents, and synthesizes the result.",
+  "version": "0.1.0",
+  "author": {
+    "name": "chaturvediaksh1304-sudo"
+  },
+  "homepage": "https://github.com/chaturvediaksh1304-sudo/Roots-Self-attaching-agent-orchestration",
+  "keywords": ["agents", "orchestration", "subagents", "cli"]
+}

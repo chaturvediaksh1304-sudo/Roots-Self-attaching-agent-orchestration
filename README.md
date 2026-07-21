@@ -87,6 +87,26 @@ Verify:
 roots --help
 ```
 
+## Use as a Claude Code plugin
+
+Roots ships a thin [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
+plugin that adds a `/roots` slash command. Add the marketplace, then install:
+
+```
+/plugin marketplace add chaturvediaksh1304-sudo/Roots-Self-attaching-agent-orchestration
+/plugin install roots@roots
+```
+
+Then, from any project:
+
+```
+/roots Add a contact form with email validation
+```
+
+The command installs the `roots` CLI if missing (via `pipx`), runs
+`init` → `run` → `status`, and points you at `.roots/result.md`. It still needs
+`ANTHROPIC_API_KEY` (or an OpenAI-compatible backend) in your environment.
+
 ## Usage
 
 ```bash

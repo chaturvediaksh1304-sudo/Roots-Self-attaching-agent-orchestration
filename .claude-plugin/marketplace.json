@@ -1,0 +1,13 @@
+{
+  "name": "roots",
+  "owner": {
+    "name": "chaturvediaksh1304-sudo"
+  },
+  "plugins": [
+    {
+      "name": "roots",
+      "source": "./",
+      "description": "Self-attaching agent orchestration. Drop it into any project; it grills you on the goal, decomposes it, generates specialized subagents, and synthesizes the result. Model-agnostic (Anthropic / OpenAI-compatible / Claude Code)."
+    }
+  ]
+}
