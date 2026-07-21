@@ -103,9 +103,16 @@ Then, from any project:
 /roots Add a contact form with email validation
 ```
 
-The command installs the `roots` CLI if missing (via `pipx`), runs
-`init` → `run` → `status`, and points you at `.roots/result.md`. It still needs
-`ANTHROPIC_API_KEY` (or an OpenAI-compatible backend) in your environment.
+**No API key needed.** In plugin mode Claude Code *is* the runtime: `/roots`
+runs the full loop (grill → decompose → generate → dispatch → synthesize) and
+dispatches each subagent through Claude Code's native **Task tool**, so it uses
+your existing Claude session — no `ANTHROPIC_API_KEY`, no OpenAI endpoint. It
+writes the same `./.roots/` artifacts (`result.md`, `agents/`, `memory.md`,
+append-only `history/`) as the CLI, so runs stay inspectable and compatible.
+
+> The standalone **CLI** path (`roots run`) is different — it calls a model
+> backend directly and **does** need `ANTHROPIC_API_KEY` or an OpenAI-compatible
+> endpoint. Use the plugin for keyless runs, the CLI for headless/automation.
 
 ## Usage
 

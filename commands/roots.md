@@ -1,36 +1,127 @@
 ---
-description: Run Roots agent orchestration on the current project — grill, decompose, dispatch subagents, synthesize.
+description: Run Roots agent orchestration on the current project using your Claude session — no API key. Grill, decompose, dispatch subagents via the Task tool, synthesize.
 argument-hint: [goal]
 ---
 
-You are driving the **Roots** CLI (`roots`), a self-attaching agent
-orchestrator. Run it against the user's current working directory.
+You are the **Roots** runtime. Roots is self-attaching agent orchestration:
+grill → decompose → generate → dispatch → synthesize → memory. In this plugin
+you run the loop **yourself** — subagents are dispatched through Claude Code's
+native **Task tool**, so this needs **no API key** (it uses the current Claude
+session). Reuse the `roots` CLI only for the non-LLM mechanical steps.
 
 Goal (may be empty): `$ARGUMENTS`
 
-Do this in order, stopping to report at each step:
+Follow the loop in order. Write every artifact under `./.roots/` exactly as
+specified — the file formats below match what the standalone CLI produces, so
+`roots status` and the history archive stay compatible.
 
-1. **Ensure the CLI is installed.** Run `command -v roots`. If it is missing,
-   install it once with:
-   ```bash
-   pipx install git+https://github.com/chaturvediaksh1304-sudo/Roots-Self-attaching-agent-orchestration.git
-   ```
-   (Fall back to `pip install ...` if `pipx` is unavailable.) Requires Python 3.11+.
+### 0. Attach (mechanical, no key)
+- If `./.roots/config.yaml` is missing, run `roots init` to scan the project and
+  write it. Report the detected stack. (If the `roots` CLI is not installed, you
+  can still proceed — just create `./.roots/` yourself; installing the CLI is
+  optional in plugin mode.)
+- Ensure `./.roots/config.yaml` contains `backend: claude_code` (this run is
+  driven by the Task tool, not an API backend).
 
-2. **Check the backend key.** Roots defaults to the `anthropic` backend and reads
-   `ANTHROPIC_API_KEY`. If it is unset, tell the user and stop — do not proceed
-   without a key. (For an OpenAI-compatible endpoint, they set `backend:
-   generic_openai` in `.roots/config.yaml` plus `OPENAI_BASE_URL` / `OPENAI_API_KEY`.)
+### 1. Grill
+Interrogate the user with `AskUserQuestion` until the goal is unambiguous
+(2–4 sharp questions: scope, constraints, done-criteria, out-of-scope). If the
+goal arg is empty, first ask what they want. Keep each Q→A pair.
 
-3. **Attach if needed.** If `.roots/config.yaml` does not exist, run `roots init`
-   to scan the project and write it. Show the detected stack.
+### 2. Decompose
+Break the goal into **2–6 non-overlapping** subtasks. Each subtask:
+- `name`: kebab-case role, e.g. `api-research`
+- `boundary`: exactly one sentence stating what it owns (boundaries must not overlap)
+- `depends_on`: list of other subtask names it needs first (often empty)
+- `tools`: tools it should use (e.g. `Read`, `Grep`, `WebSearch`), or empty
 
-4. **Run.** If a goal was given, run `roots run --goal "$ARGUMENTS"`. If not, run
-   `roots run` and let it grill the user interactively.
+Write `./.roots/decomposition.json`:
+```json
+{ "goal": "<goal>", "subtasks": [ { "name": "...", "boundary": "...", "depends_on": [], "tools": [] } ] }
+```
 
-5. **Report.** Run `roots status`, then point the user at the outputs:
-   `.roots/result.md` (synthesized result) and `.roots/agents/` (per-subagent
-   configs + results).
+### 3. Generate subagent configs
+For each subtask write `./.roots/agents/<name>.md`:
+```
+---
+role: <name>
+depends_on: <comma-list or (none)>
+tools: <comma-list or (none)>
+---
 
-Never invent Roots subcommands — the only ones are `init`, `run`, `status`.
-If any command errors, surface the exact error and stop.
+# <name>
+
+## Task boundary
+<boundary>
+
+## Tool allowlist
+<comma-list or (none)>
+
+## Output contract
+Begin your reply with a single line `SUMMARY: <one sentence>`, then a blank line, then the full detail.
+```
+
+### 4. Dispatch (via the Task tool — this is the keyless part)
+- Compute dependency **layers**: layer 0 = subtasks with no `depends_on`; each
+  later layer depends only on earlier ones (topological). Never dispatch a
+  subtask before its dependencies finish.
+- Run each layer in order. **Within a layer, spawn the subagents in parallel**
+  (one `Task`/Agent call each, in a single message). Give each subagent: its
+  boundary as the task, its tool allowlist, the results of its dependencies, and
+  the output contract (reply must start with `SUMMARY: <one sentence>`).
+- For each subagent, write `./.roots/agents/<name>.result.md`:
+```
+## Summary
+
+<the SUMMARY line>
+
+---
+
+## Full detail
+
+<the subagent's full reply>
+```
+- If a subagent fails, record status `failed` with the reason and continue the
+  other subtasks; do not abort the whole run.
+
+### 5. Synthesize
+Merge the subagent results into `./.roots/result.md`: restate the goal, then a
+coherent combined answer/deliverable drawn from the subagents' full detail (not
+just the summaries). Resolve conflicts explicitly.
+
+### 6. Memory + archive
+Write `./.roots/memory.md`:
+```
+---
+goal: <goal>
+timestamp: <UTC ISO-8601, seconds>
+status: complete | partial
+---
+
+# Memory - Roots run
+
+## Current phase
+Phase 1 - Core orchestration loop
+
+## Plan
+- <name>: <boundary>   (one line per subtask)
+
+## Subagent outcomes
+- [x] <name>: <summary> (.roots/agents/<name>.result.md)   (x = ok, space = failed)
+
+## Next step
+Phase 1 run complete.
+```
+Then archive: copy `decomposition.json`, `result.md`, and `agents/` into
+`./.roots/history/<timestamp>-<slug>/` where `<slug>` is the goal lowercased,
+non-alphanumerics → `-`, trimmed to 40 chars. History is append-only — never
+overwrite an existing history folder.
+
+### 7. Report
+Print a short summary: subtask count, pass/fail per subagent, and the paths
+`./.roots/result.md` + `./.roots/agents/`. If the CLI is installed, run
+`roots status` to confirm the memory file reads back cleanly.
+
+**Constraints:** keyless — never ask for or require an API key in this mode.
+Never invent Roots artifacts beyond those above. Keep boundaries non-overlapping
+(that is the core invariant). Respect `depends_on` ordering strictly.
