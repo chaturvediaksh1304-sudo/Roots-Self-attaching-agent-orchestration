@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <strong>Self-attaching agent orchestration.</strong><br>
+  <strong>Self-attaching agent orchestration!</strong><br>
   Drop it into any project. It grills you on the goal, decomposes it into
   non-overlapping subtasks, generates specialized subagents to run them, and
   synthesizes the result.
